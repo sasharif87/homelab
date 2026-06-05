@@ -45,6 +45,16 @@ Once you have things running, you'll want them to stay running without babysitti
 
 ## Hardware
 
+### Where I Started
+
+i5-7600K, 32GB RAM, TrueNAS, a QNAP with 4×4TB drives, and a pile of mismatched drives I'd accumulated over the years. That ran for a long time and handled everything I needed at the time — media serving, basic file storage, a few containers.
+
+The current setup (Ryzen 9 5900XT, 128GB, Proxmox, 32TB ZFS raidz2, GPU passthrough) came later, piece by piece, as specific problems needed solving. More RAM when containers got constrained. A proper HBA when I outgrew the QNAP. A GPU when I wanted local AI inference. None of it was planned upfront.
+
+You don't need to start where this ended up. You need to start.
+
+---
+
 ### What Actually Matters
 
 **RAM first.** More RAM than you think you need. ZFS wants RAM for its cache (ARC). Containers want RAM. If you're running AI models, they want RAM. 32GB is a reasonable floor for a machine doing real work. 64GB+ is better.
