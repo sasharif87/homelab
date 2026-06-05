@@ -128,6 +128,8 @@ These aren't optional if you're exposing anything to the internet:
 
 ## The Honest Cost
 
+> **Note:** These numbers reflect early-to-mid 2025 pricing. Tariffs and hardware demand have pushed costs up since — treat these as a floor, not current market rates. Check Facebook Marketplace and eBay for what things are actually going for before you budget.
+
 **Hardware:** $300–600 for a capable used workstation. More if you want ECC RAM or enterprise storage.
 
 **Drives:** $10–15/TB for enterprise SATA/SAS pulls from Facebook Marketplace. A 30TB usable pool costs around $400 in drives.
