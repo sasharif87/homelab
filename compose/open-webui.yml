@@ -1,0 +1,19 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:cuda
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - 3000:8080
+    environment:
+      - OLLAMA_BASE_URL=http://${SERVER_IP}:11434
+      - WEBUI_AUTH=true
+      - ENABLE_API_KEY=true
+      - VECTOR_DB=qdrant
+      - QDRANT_URI=http://${SERVER_IP}:6333
+    volumes:
+      - /mnt/apps/appdata/open-webui:/app/backend/data
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536

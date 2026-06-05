@@ -1,0 +1,16 @@
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:9
+    container_name: forgejo
+    restart: unless-stopped
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /mnt/apps/appdata/forgejo:/data
+    ports:
+      - "3010:3000"
+      - "2222:22"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"

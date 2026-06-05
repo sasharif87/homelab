@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly VM maintenance reboot — Sunday 4:30 AM Chicago time
+
+[Timer]
+OnCalendar=Sun *-*-* 04:30:00 America/Chicago
+Persistent=false
+
+[Install]
+WantedBy=timers.target

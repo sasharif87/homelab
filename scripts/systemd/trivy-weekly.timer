@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly Trivy scan — Sunday 5am CDT (1hr after Watchtower)
+
+[Timer]
+OnCalendar=Sun *-*-* 05:00:00
+Timezone=America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target

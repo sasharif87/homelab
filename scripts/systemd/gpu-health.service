@@ -1,0 +1,10 @@
+[Unit]
+Description=GPU health heartbeat to Uptime Kuma
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/gpu-health.sh
+User=root
+StandardOutput=journal
+StandardError=journal

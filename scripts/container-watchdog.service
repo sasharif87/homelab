@@ -1,0 +1,17 @@
+[Unit]
+Description=Container Watchdog — auto-restart failed containers with Discord alerts
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=15
+ExecStart=/usr/bin/python3 /opt/scripts/container-watchdog.py
+EnvironmentFile=/etc/container-watchdog.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=container-watchdog
+
+[Install]
+WantedBy=multi-user.target

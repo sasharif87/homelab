@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly rkhunter scan — Saturday 4am CDT (after malware-weekly at 3am)
+
+[Timer]
+OnCalendar=Sat *-*-* 04:00:00
+Timezone=America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target

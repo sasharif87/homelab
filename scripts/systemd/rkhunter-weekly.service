@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly rootkit and system integrity scan via rkhunter
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/rkhunter-weekly.sh
+EnvironmentFile=/etc/container-watchdog.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rkhunter-weekly

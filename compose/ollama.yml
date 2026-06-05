@@ -1,0 +1,17 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    runtime: nvidia
+    mem_limit: 10g
+    mem_reservation: 2g
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    ports:
+      - 11434:11434
+    volumes:
+      - /mnt/docker-local/ollama:/root/.ollama
+    labels:
+      - com.centurylinklabs.watchtower.enable=false

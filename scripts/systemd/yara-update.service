@@ -1,0 +1,9 @@
+[Unit]
+Description=Update YARA Neo23x0/signature-base rules
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/yara-update.sh
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=yara-update

@@ -1,0 +1,12 @@
+[Unit]
+Description=Pre-flight driver/kernel update check
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/preflight-check.sh
+EnvironmentFile=/etc/container-watchdog.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=preflight-check

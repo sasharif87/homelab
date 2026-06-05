@@ -1,0 +1,10 @@
+[Unit]
+Description=Pre-flight check — Sunday 3:30 AM Chicago (primary)
+
+[Timer]
+OnCalendar=Sun *-*-* 03:30:00 America/Chicago
+Unit=preflight-check.service
+Persistent=false
+
+[Install]
+WantedBy=timers.target

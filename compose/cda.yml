@@ -1,0 +1,27 @@
+# CDA Calculator — Proxmox Services VM
+# Port 3002 (3001 in use by uptime-kuma)
+# NPM proxy: cda.<your-domain> -> http://localhost:3002
+
+services:
+  cdalab:
+    build:
+      context: /mnt/apps/appdata/cda/src
+    pull_policy: build
+    container_name: cdalab
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    environment:
+      - DB_PATH=/app/db/cdalab.db
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - PORT=3001
+    volumes:
+      - /mnt/apps/appdata/cda/db:/app/db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 25s
+      retries: 3

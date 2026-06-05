@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly Trivy container image vulnerability scan
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/trivy-weekly.sh
+User=root
+StandardOutput=journal
+StandardError=journal

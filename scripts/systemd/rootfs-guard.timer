@@ -1,0 +1,10 @@
+[Unit]
+Description=Root filesystem leak guard — nightly 2 AM Chicago
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 America/Chicago
+Unit=rootfs-guard.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,16 @@
+services:
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    ports:
+      - 8083:8080
+      - 8084:8081
+    volumes:
+      - /mnt/apps/appdata/calibre:/config
+      - /mnt/storage/media/ebooks:/books
+      - /mnt/storage/downloads:/downloads

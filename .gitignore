@@ -1,0 +1,21 @@
+# Secrets
+.env
+*.env
+Docs/secrets.md
+
+# Personal / ops docs — tracked on private remote only
+Docs/
+homepage/
+
+# IDE / tooling
+.claude/
+.vs/
+.vscode/
+.mcp.json
+__pycache__/
+*.pyc
+
+# Runtime / operational state
+*.log
+*-state.json
+.claude/scheduled_tasks.lock

@@ -1,0 +1,44 @@
+services:
+  kiwix:
+    image: ghcr.io/kiwix/kiwix-serve:latest
+    container_name: kiwix
+    restart: unless-stopped
+    ports:
+      - 8086:8080
+    volumes:
+      - /mnt/storage/knowledge/kiwix:/data
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["kiwix-serve --port=8080 /data/*.zim"]
+
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: tileserver
+    restart: unless-stopped
+    ports:
+      - 8087:8080
+    volumes:
+      - /mnt/storage/knowledge/maps:/data
+
+  kolibri:
+    image: learningequality/kolibri:latest
+    container_name: kolibri
+    restart: unless-stopped
+    ports:
+      - 8088:8080
+    environment:
+      - KOLIBRI_HOME=/kolibri
+    volumes:
+      - /mnt/apps/appdata/kolibri:/kolibri
+      - /mnt/storage/knowledge/kolibri-content:/kolibri/content
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    restart: unless-stopped
+    ports:
+      - 9925:9000
+    environment:
+      BASE_URL: http://${SERVER_IP}:9925
+      ALLOW_SIGNUP: false
+    volumes:
+      - /mnt/apps/appdata/mealie:/app/data

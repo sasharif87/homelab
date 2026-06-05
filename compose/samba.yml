@@ -1,0 +1,16 @@
+services:
+  samba:
+    image: dperson/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    ports:
+      - "445:445"
+      - "139:139"
+    environment:
+      - TZ=America/Chicago
+    command: >
+      -u "${SAMBA_USER};${SAMBA_PASSWORD}"
+      -s "storage;/mnt/storage;yes;no;no;${SAMBA_USER}"
+      -g "force user = root"
+    volumes:
+      - /mnt/storage:/mnt/storage

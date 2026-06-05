@@ -1,0 +1,17 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      - WEBSOCKET_ENABLED=true
+      - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}
+      - SIGNUPS_ALLOWED=false
+      - DOMAIN=https://vaultwarden.${DOMAIN}
+    ports:
+      - 8080:80
+      - 3012:3012
+    volumes:
+      - /mnt/apps/appdata/vaultwarden:/data
+    labels:
+      - com.centurylinklabs.watchtower.enable=false

@@ -1,0 +1,15 @@
+[Unit]
+Description=Post-boot container health check
+After=docker.service container-watchdog.service
+Wants=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/scripts/boot-check.py
+EnvironmentFile=/etc/container-watchdog.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=boot-check
+
+[Install]
+WantedBy=multi-user.target

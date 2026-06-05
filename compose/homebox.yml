@@ -1,0 +1,10 @@
+services:
+  homebox:
+    image: ghcr.io/sysadminsmedia/homebox:latest
+    container_name: homebox
+    restart: unless-stopped
+    ports:
+      - 7745:7745
+    volumes:
+      - /mnt/apps/appdata/homebox:/data
+

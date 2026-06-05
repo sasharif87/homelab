@@ -1,0 +1,10 @@
+[Unit]
+Description=GPU health heartbeat — every 20h (inside 25h Uptime Kuma window)
+
+[Timer]
+OnBootSec=20min
+OnUnitActiveSec=20h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

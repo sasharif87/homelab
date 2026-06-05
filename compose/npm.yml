@@ -1,0 +1,15 @@
+services:
+  npm:
+    build:
+      context: /mnt/apps/compose/npm-build
+      dockerfile: Dockerfile
+    image: npm-duckdns:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 8181:81
+    volumes:
+      - /mnt/apps/npm/data:/data
+      - /mnt/apps/npm/letsencrypt:/etc/letsencrypt

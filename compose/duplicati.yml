@@ -1,0 +1,20 @@
+services:
+  duplicati:
+    image: lscr.io/linuxserver/duplicati:latest
+    container_name: duplicati
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - SETTINGS_ENCRYPTION_KEY=${DUPLICATI_ENCRYPTION_KEY}
+    ports:
+      - 8200:8200
+    volumes:
+      - /mnt/apps/appdata/duplicati:/config
+      - /mnt/storage/backups:/backups
+      - /mnt/apps/appdata:/source/appdata:ro
+      - /mnt/apps/compose:/source/compose:ro
+      - /mnt/apps/npm/data:/source/npm-data:ro
+      - /mnt/storage/photos:/source/photos:ro
+      - /mnt/storage/data/documents:/source/documents:ro

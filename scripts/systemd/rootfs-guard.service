@@ -1,0 +1,12 @@
+[Unit]
+Description=Root filesystem leak guard
+After=local-fs.target remote-fs.target
+Wants=remote-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/rootfs-guard.sh
+EnvironmentFile=/etc/container-watchdog.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rootfs-guard

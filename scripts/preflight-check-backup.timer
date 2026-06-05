@@ -1,0 +1,10 @@
+[Unit]
+Description=Pre-flight check — Sunday 3:50 AM Chicago (backup, fires if primary failed)
+
+[Timer]
+OnCalendar=Sun *-*-* 03:50:00 America/Chicago
+Unit=preflight-check.service
+Persistent=false
+
+[Install]
+WantedBy=timers.target

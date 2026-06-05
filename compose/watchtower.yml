@@ -1,0 +1,13 @@
+services:
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=America/Chicago
+      - DOCKER_API_VERSION=1.45
+      - WATCHTOWER_SCHEDULE=0 0 4 * * 0
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL} ${WATCHTOWER_NTFY_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

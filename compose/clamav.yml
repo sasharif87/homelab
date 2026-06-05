@@ -1,0 +1,16 @@
+services:
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    restart: unless-stopped
+    environment:
+      - TZ=America/Chicago
+      - CLAMD_CONF_MaxFileSize=500M
+      - CLAMD_CONF_MaxScanSize=500M
+      - CLAMD_CONF_StreamMaxLength=500M
+      - CLAMD_CONF_ReadTimeout=300
+    volumes:
+      - /mnt/apps/appdata/clamav:/var/lib/clamav
+      - /mnt/storage:/mnt/storage:ro
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"

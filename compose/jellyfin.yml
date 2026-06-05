@@ -1,0 +1,22 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    runtime: nvidia
+    network_mode: host
+    environment:
+      - JELLYFIN_PublishedServerUrl=http://${SERVER_IP}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    volumes:
+      - /mnt/docker-local/appdata/jellyfin:/config
+      - /mnt/docker-local/transcodes:/transcodes
+      - /mnt/storage/media:/media:ro
+      - /mnt/storage/media/tv:/tv:ro
+      - /mnt/storage/media/movies:/movies:ro
+      - /mnt/storage/media/music:/music:ro
+      - /mnt/storage/photos:/photos:ro
+      - /mnt/storage/media/youtube:/youtube:ro

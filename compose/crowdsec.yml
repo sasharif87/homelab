@@ -1,0 +1,17 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    environment:
+      - TZ=America/Chicago
+      - GID=1000
+      - COLLECTIONS=crowdsecurity/nginx
+    ports:
+      - "127.0.0.1:9099:8080"
+    volumes:
+      - /mnt/apps/appdata/crowdsec/config:/etc/crowdsec
+      - /mnt/apps/appdata/crowdsec/data:/var/lib/crowdsec/data
+      - /mnt/apps/npm/data/logs:/var/log/npm:ro
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"

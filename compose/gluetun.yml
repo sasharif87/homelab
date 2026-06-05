@@ -1,0 +1,200 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8082:8080      # qBittorrent WebUI
+      - 9696:9696      # Prowlarr
+      - 8989:8989      # Sonarr
+      - 7878:7878      # Radarr
+      - 5299:5299      # LazyLibrarian
+      - 8686:8686      # Lidarr
+      - 6767:6767      # Bazarr
+      - 8191:8191      # FlareSolverr
+      - 5010:5010      # Mousehole
+      - 2468:2468      # Cross-seed
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - SERVER_COUNTRIES=United States
+      - VPN_PORT_FORWARDING=on
+      - VPN_PORT_FORWARDING_PROVIDER=protonvpn
+      - "VPN_PORT_FORWARDING_UP_COMMAND=/gluetun/port-forward.sh {{PORTS}}"
+      - QBIT_PASS=${QBIT_PASS}
+      - VPN_ENDPOINT_IP_VERSION=4
+      - DNS_UPSTREAM_TYPE=plain
+      - DNS_UPSTREAM_PLAIN_ADDRESSES=1.1.1.1:53
+      - WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL=25s
+      - FIREWALL_OUTBOUND_SUBNETS=172.16.0.0/12,${LAN_SUBNET}
+    volumes:
+      - /mnt/apps/gluetun:/gluetun
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent
+    container_name: qbittorrent
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - WEBUI_PORT=8080
+      - WEBUI_HOSTNAMEMAP=${SERVER_IP}:8082
+    volumes:
+      - /mnt/apps/qbittorrent:/config
+      - /mnt/storage/downloads:/downloads
+      - /mnt/storage/media/tv:/tv
+      - /mnt/storage/media/movies:/movies
+      - /mnt/storage/media/ebooks:/ebooks
+      - /mnt/storage/media/audiobooks:/audiobooks
+
+  mousehole:
+    image: tmmrtn/mousehole:latest
+    container_name: mousehole
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - TZ=America/Chicago
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+    volumes:
+      - /mnt/apps/mousehole:/srv/mousehole
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - LOG_LEVEL=info
+      - TZ=America/Chicago
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - PROWLARR__PORT=9696
+      - PROWLARR__BIND=0.0.0.0
+    volumes:
+      - /mnt/apps/prowlarr:/config
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /mnt/apps/sonarr:/config
+      - /mnt/storage/media/tv:/tv
+      - /mnt/storage/downloads:/downloads
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /mnt/apps/radarr:/config
+      - /mnt/storage/media/movies:/movies
+      - /mnt/storage/downloads:/downloads
+
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: lazylibrarian
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - DOCKER_MODS=linuxserver/mods:lazylibrarian-ffmpeg
+    volumes:
+      - /mnt/apps/lazylibrarian:/config
+      - /mnt/storage/media/ebooks:/ebooks
+      - /mnt/storage/media/audiobooks:/audiobooks
+      - /mnt/storage/downloads:/downloads
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /mnt/apps/appdata/lidarr:/config
+      - /mnt/storage/media/music:/music
+      - /mnt/storage/downloads:/downloads
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /mnt/apps/appdata/bazarr:/config
+      - /mnt/storage/media/tv:/tv
+      - /mnt/storage/media/movies:/movies
+
+  cross-seed:
+    image: crossseed/cross-seed:latest
+    container_name: cross-seed
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    command: daemon
+    depends_on:
+      - gluetun
+      - qbittorrent
+    volumes:
+      - /mnt/apps/cross-seed:/config
+      - /mnt/apps/qbittorrent/qBittorrent/BT_backup:/torrents:ro
+      - /mnt/storage/downloads:/downloads
+      - /mnt/storage/media/tv:/tv:ro
+      - /mnt/storage/media/movies:/movies:ro
+      - /mnt/storage/media/ebooks:/ebooks:ro
+      - /mnt/storage/media/audiobooks:/audiobooks:ro
