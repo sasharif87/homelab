@@ -1,5 +1,11 @@
 # Scripts Reference
 
+These scripts exist because I've rebuilt this stack more than once, and the second time through I broke things I didn't break the first time. Not because the stack got more complicated — because I was doing it from memory and missed steps.
+
+The startup sequence, the watchdogs, the boot checks — none of them existed originally. They got written after something went wrong and I had to figure out why. The malware pipeline came from wanting to know if a compromised container had already done something before I caught it. The dashboard seeders exist because re-clicking 40 services into a fresh Homarr install is exactly the kind of thing that makes you question your choices.
+
+The goal isn't a polished automation framework. It's that when something breaks — and it will — the recovery is a `git clone` and a few commands, not a weekend of archaeology.
+
 All scripts live in `scripts/`. They require no framework — just bash or Python 3.
 
 Systemd unit files for the scheduled ones are in `scripts/systemd/`. To install one:
