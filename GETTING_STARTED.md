@@ -140,6 +140,30 @@ These aren't optional if you're exposing anything to the internet:
 
 ---
 
+## A Note on Kubernetes
+
+Browse homelab repos on GitHub and you'll find a lot of Kubernetes. It can look like the "serious" choice. It isn't, for most home setups.
+
+**K8s makes sense when you have:**
+
+- 3+ nodes across multiple physical locations with genuine HA requirements
+- A job that uses it and you're deliberately practicing
+- Workloads that actually need cluster scheduling
+
+**K8s doesn't make sense when you have:**
+
+- One machine, or multiple machines in the same house on the same circuit — one power event takes everything down regardless of how many nodes you have
+- Personal services: media, photos, passwords, knowledge archive
+- A 2AM incident you need to debug without a control plane in the way
+
+Even the multi-node case is questionable. Three nodes in the same house isn't real high availability — it's complexity theater. For actual multi-site resilience, Tailscale between two physical locations with replicated data beats a home Kubernetes cluster on every practical metric: simpler, faster to recover, and a power outage at site A doesn't cascade.
+
+A lot of k8s homelab content exists because people needed to learn it for work, or because it signals a certain kind of seriousness. That's a legitimate reason — but own that it's a training environment, not an optimal infrastructure choice for running Jellyfin and Vaultwarden.
+
+Docker Compose is the right tool here. Readable configs, trivial to debug, nothing to install beyond Docker, and fast to recover when something goes wrong. This repo runs 40+ services on it without drama.
+
+---
+
 ## Resources That Actually Helped
 
 - **r/homelab** and **r/selfhosted** — the communities where most of this knowledge lives
