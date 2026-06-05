@@ -8,11 +8,11 @@ This repo is the actual configs that run a real server — not a demo or a tutor
 
 ## The Why
 
-Your data is already out there. The question is how much of it, with who, and whether you have any say in what happens to it.
+This started because I lost access to books and movies I had paid for. Not pirated — purchased. The platform lost the license, the library disappeared, and there was nothing to be done about it. That was the moment it became clear that "buying" something through someone else's platform doesn't mean you own it. It means you're renting access until they decide otherwise.
 
-Self-hosting doesn't make you invisible. It lets you control where the surface is. Every service you move inhouse is one fewer breach target, one fewer set of terms that can change, one fewer company that can be acquired or shut down with your data inside it. The things that matter to you stop being someone else's data point.
+So I decided to take the control back. When it lives on your hardware, what you have is what you have. No license server to phone home, no account to get locked, no service announcement telling you your library is going away in 30 days. That principle extended naturally to everything else — photos, passwords, documents, AI. If it matters, it should be somewhere you control.
 
-There's also the ownership problem. You can buy something — a movie, an album, a book — and lose access to it when the company folds, kills the platform, or decides the license no longer applies to you. That's not ownership, it's a subscription with extra steps. When it lives on your hardware, what you have is what you have. No license server to phone home, no account to get locked, no service announcement telling you your library is going away in 30 days.
+Self-hosting doesn't make you invisible. It lets you control where the surface is. Every service you move inhouse is one fewer breach target, one fewer set of terms that can change, one fewer company that gets acquired with your data inside it.
 
 This stack is built around utility and controlled exposure — not lockdown. Things are accessible because you chose to make them accessible, through an entry point you control, on terms you set. The goal is that you decide what's reachable, how it's reachable, and who can reach it. Not a default config somewhere you forgot about.
 
