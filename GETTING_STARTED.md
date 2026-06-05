@@ -140,27 +140,17 @@ These aren't optional if you're exposing anything to the internet:
 
 ---
 
-## A Note on Kubernetes
+## Why I Didn't Use Kubernetes
 
-Browse homelab repos on GitHub and you'll find a lot of Kubernetes. It can look like the "serious" choice. It isn't, for most home setups.
+A lot of homelab repos run Kubernetes. I looked at it and chose not to, and here's the honest reasoning.
 
-**K8s makes sense when you have:**
+My setup is one machine. Even if I added two more nodes, they'd all be in the same house on the same circuit — one power event takes everything down regardless. That's not real high availability, it's just more moving parts. For actual multi-site resilience the answer is Tailscale between two physical locations, not a cluster scheduler.
 
-- 3+ nodes across multiple physical locations with genuine HA requirements
-- A job that uses it and you're deliberately practicing
-- Workloads that actually need cluster scheduling
+The failure mode also matters. When something breaks at 2AM with Docker Compose, I read a log and fix it. When something breaks in k8s, I'm debugging etcd, control plane state, and CNI networking before I even get to the actual problem. For personal services that's a bad trade.
 
-**K8s doesn't make sense when you have:**
+I'm also not running workloads that need cluster scheduling. Jellyfin doesn't need to be rescheduled across nodes. Neither does Vaultwarden. Docker Compose gives me readable configs, nothing to install beyond Docker itself, and a stack that recovers from a bad state with `docker compose up -d`.
 
-- One machine, or multiple machines in the same house on the same circuit — one power event takes everything down regardless of how many nodes you have
-- Personal services: media, photos, passwords, knowledge archive
-- A 2AM incident you need to debug without a control plane in the way
-
-Even the multi-node case is questionable. Three nodes in the same house isn't real high availability — it's complexity theater. For actual multi-site resilience, Tailscale between two physical locations with replicated data beats a home Kubernetes cluster on every practical metric: simpler, faster to recover, and a power outage at site A doesn't cascade.
-
-A lot of k8s homelab content exists because people needed to learn it for work, or because it signals a certain kind of seriousness. That's a legitimate reason — but own that it's a training environment, not an optimal infrastructure choice for running Jellyfin and Vaultwarden.
-
-Docker Compose is the right tool here. Readable configs, trivial to debug, nothing to install beyond Docker, and fast to recover when something goes wrong. This repo runs 40+ services on it without drama.
+If you're learning k8s for work or running genuinely distributed workloads across sites, it makes sense. If you're self-hosting personal services on hardware you own — Docker Compose is the right tool and this repo is built around it.
 
 ---
 
