@@ -168,9 +168,16 @@ If you're learning k8s for work or running genuinely distributed workloads acros
 
 ## Resources That Actually Helped
 
+**Getting started videos — search these on YouTube:**
+
+- **TechnoTim** — search "Proxmox install" and "Proxmox VM setup". His install series covers the full process from ISO to first VM and is where I'd send anyone starting from scratch.
+- **Lawrence Systems** — search "TrueNAS" for anything storage-related. Tom covers pool setup, drive selection, and the SMB/NFS share config in detail. Also good for Proxmox networking.
+- **Craft Computing** — general homelab and Docker content. Good for understanding the why, not just the how.
+- **Wolfgang's Channel** — networking and security focus. VLANs, reverse proxies, the stuff that most beginner guides skip.
+
+**Reference and community:**
+
 - **r/homelab** and **r/selfhosted** — the communities where most of this knowledge lives
-- **Serve the Home (STH)** — the best source for used server hardware research
-- **TechnoTim** on YouTube — practical homelab guides, well-produced
-- **Wolfgang's Channel** on YouTube — excellent on networking and security
+- **Serve the Home (STH)** — the best source for used server hardware research before you buy
 - **The Proxmox forums** — direct answers for virtualization-specific problems
 - **LinuxServer.io** — the Docker images that make running most of these services straightforward
