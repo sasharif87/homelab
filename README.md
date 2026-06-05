@@ -26,6 +26,7 @@ None of it was built at once. Each piece got added when there was a real reason 
 | [LESSONS.md](LESSONS.md) | Things that cost hours and only make sense in hindsight |
 | [REFERENCE.md](REFERENCE.md) | Commands, patterns, and troubleshooting for day-to-day operation |
 | [compose/](compose/) | Docker Compose files — one per service |
+| [SCRIPTS.md](SCRIPTS.md) | What every script does and how to install the systemd units |
 | [scripts/](scripts/) | Automation scripts and systemd units |
 | [compose/.env.example](compose/.env.example) | All environment variables the compose files expect |
 
@@ -62,62 +63,7 @@ cp compose/.env.example compose/.env
 docker compose -f compose/jellyfin.yml up -d
 ```
 
-The scripts in `scripts/` are meant to run on the server itself. Most are standalone shell scripts or Python — no framework dependencies.
-
----
-
-## Scripts
-
-All scripts live in `scripts/`. They require no framework — just bash or Python 3. Systemd unit files for the scheduled ones are in `scripts/systemd/`; drop them into `/etc/systemd/system/` and `systemctl enable --now` them.
-
-### Startup sequence
-
-| Script | What it does |
-| :--- | :--- |
-| `preflight-check.sh` / `.py` | Runs on boot — verifies NVMe mounts, NFS, and ZFS are healthy before Docker is allowed to start |
-| `staged-startup.sh` | Starts containers in waves with short delays between groups — prevents I/O spikes and lets dependencies come up in order |
-| `vm-reboot.sh` / `maintenance-reboot.sh` | Clean shutdown sequence for the services VM before Proxmox maintenance or scheduled reboots |
-| `boot-check.py` | Post-boot health checks — confirms containers are up and services are responding |
-
-### Watchdogs
-
-| Script | What it does |
-| :--- | :--- |
-| `container-watchdog.py` | Polls containers on a schedule, restarts any that are unhealthy or exited unexpectedly |
-| `gpu-health.sh` | Checks GPU utilization and VRAM; sends a notification if the card isn't responding |
-| `gluetun-port-forward.sh` | Refreshes the VPN forwarded port on a timer so qBittorrent stays seeding |
-| `rootfs-guard.sh` | Monitors root filesystem usage; alerts before it fills up |
-
-### Security
-
-| Script | What it does |
-| :--- | :--- |
-| `malware-setup.sh` | One-time setup for ClamAV + YARA scanning — installs rules and wires up the pipeline |
-| `malware-watch.sh` | Inotify-based watcher that scans new files in download directories as they arrive |
-| `malware-weekly.sh` | Weekly full-system ClamAV scan |
-| `yara-update.sh` | Pulls updated YARA rules from community sources |
-| `rkhunter-weekly.sh` | Weekly rootkit hunter scan |
-| `trivy-weekly.sh` | Weekly Trivy CVE scan against running container images |
-
-### Dashboard and service setup (one-time)
-
-| Script | What it does |
-| :--- | :--- |
-| `homarr-seed-apps.sh` | Seeds all services into Homarr via API — run once after a fresh install |
-| `homarr-add-monitoring.sh` | Adds monitoring apps to Homarr; separate from the main seed for incremental adds |
-| `duplicati-seed-backups.sh` | Seeds Duplicati backup jobs via API — requires `DUPLICATI_API_KEY` |
-| `ntfy-deploy.sh` | Configures ntfy notification topics and access controls |
-
-### Knowledge and AI
-
-| Script | What it does |
-| :--- | :--- |
-| `kiwix-stage-download.sh` | Downloads Kiwix ZIM files for offline knowledge bases |
-| `ingest-rag.py` | Ingests documents into the local vector database (Qdrant) |
-| `upload-rag-kiwix.py` | Processes Kiwix ZIM content and uploads extracted text to the RAG pipeline |
-| `rag-status.sh` | Shows collection sizes and indexing status for the RAG vector store |
-
-The `scripts/ref/` folder contains earlier versions of some scripts kept for reference — not active, not required.
+The scripts in `scripts/` are meant to run on the server itself. Most are standalone shell scripts or Python — no framework dependencies. See [SCRIPTS.md](SCRIPTS.md) for a breakdown of what each one does and how to wire up the systemd units.
 
 ---
 
