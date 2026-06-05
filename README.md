@@ -63,7 +63,7 @@ cp compose/.env.example compose/.env
 docker compose -f compose/jellyfin.yml up -d
 ```
 
-The scripts in `scripts/` are meant to run on the server itself. Most are standalone shell scripts or Python — no framework dependencies. See [SCRIPTS.md](SCRIPTS.md) for a breakdown of what each one does and how to wire up the systemd units.
+The scripts in `scripts/` are meant to run on the server itself. Most are standalone shell scripts or Python — no framework dependencies. They exist because I've rebuilt this stack more than once and the second time I broke things I didn't break the first time — doing it from memory and missing steps. The goal is that the next rebuild is a `git clone` and a few commands, not a weekend of archaeology. See [SCRIPTS.md](SCRIPTS.md) for a breakdown of what each one does and how to wire up the systemd units.
 
 ---
 
