@@ -47,9 +47,9 @@ Once you have things running, you'll want them to stay running without babysitti
 
 ### Where I Started
 
-i5-7600K, 32GB RAM, TrueNAS, a QNAP with 4×4TB drives, and a pile of mismatched drives I'd accumulated over the years. That ran for a long time and handled everything I needed at the time — media serving, basic file storage, a few containers.
+i5-7600K, 32GB RAM, TrueNAS, a QNAP with 4×4TB drives, and a pile of mismatched drives accumulated over the years. That lasted about two months before the goals outgrew it — not because it was bad hardware, but because once you start down this path you figure out pretty quickly what you actually want to do with it.
 
-The current setup (Ryzen 9 5900XT, 128GB, Proxmox, 32TB ZFS raidz2, GPU passthrough) came later, piece by piece, as specific problems needed solving. More RAM when containers got constrained. A proper HBA when I outgrew the QNAP. A GPU when I wanted local AI inference. None of it was planned upfront.
+The current setup (Ryzen 9 5900XT, 128GB, Proxmox, 32TB ZFS raidz2, GPU passthrough) came from that. Some people run an i5 for years and it's exactly what they need. Know your goals before you spend.
 
 You don't need to start where this ended up. You need to start.
 
