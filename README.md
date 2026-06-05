@@ -6,6 +6,18 @@ This repo is the actual configs that run a real server — not a demo or a tutor
 
 ---
 
+## The Why
+
+Your data is already out there. The question is how much of it, with who, and whether you have any say in what happens to it.
+
+Self-hosting doesn't make you invisible. It lets you control where the surface is. Every service you move inhouse is one fewer breach target, one fewer set of terms that can change, one fewer company that can be acquired or shut down with your data inside it. The things that matter to you stop being someone else's data point.
+
+There's also the ownership problem. You can buy something — a movie, an album, a book — and lose access to it when the company folds, kills the platform, or decides the license no longer applies to you. That's not ownership, it's a subscription with extra steps. When it lives on your hardware, what you have is what you have. No license server to phone home, no account to get locked, no service announcement telling you your library is going away in 30 days.
+
+This stack is built around utility and controlled exposure — not lockdown. Things are accessible because you chose to make them accessible, through an entry point you control, on terms you set. The goal is that you decide what's reachable, how it's reachable, and who can reach it. Not a default config somewhere you forgot about.
+
+---
+
 ## Where This Started → Where It Got To
 
 This began with a single used desktop, Docker, and Jellyfin. No rack. No plan. Just wanting to stop paying Plex and having my library depend on someone else's servers.
