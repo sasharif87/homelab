@@ -66,6 +66,61 @@ The scripts in `scripts/` are meant to run on the server itself. Most are standa
 
 ---
 
+## Scripts
+
+All scripts live in `scripts/`. They require no framework — just bash or Python 3. Systemd unit files for the scheduled ones are in `scripts/systemd/`; drop them into `/etc/systemd/system/` and `systemctl enable --now` them.
+
+### Startup sequence
+
+| Script | What it does |
+| :--- | :--- |
+| `preflight-check.sh` / `.py` | Runs on boot — verifies NVMe mounts, NFS, and ZFS are healthy before Docker is allowed to start |
+| `staged-startup.sh` | Starts containers in waves with short delays between groups — prevents I/O spikes and lets dependencies come up in order |
+| `vm-reboot.sh` / `maintenance-reboot.sh` | Clean shutdown sequence for the services VM before Proxmox maintenance or scheduled reboots |
+| `boot-check.py` | Post-boot health checks — confirms containers are up and services are responding |
+
+### Watchdogs
+
+| Script | What it does |
+| :--- | :--- |
+| `container-watchdog.py` | Polls containers on a schedule, restarts any that are unhealthy or exited unexpectedly |
+| `gpu-health.sh` | Checks GPU utilization and VRAM; sends a notification if the card isn't responding |
+| `gluetun-port-forward.sh` | Refreshes the VPN forwarded port on a timer so qBittorrent stays seeding |
+| `rootfs-guard.sh` | Monitors root filesystem usage; alerts before it fills up |
+
+### Security
+
+| Script | What it does |
+| :--- | :--- |
+| `malware-setup.sh` | One-time setup for ClamAV + YARA scanning — installs rules and wires up the pipeline |
+| `malware-watch.sh` | Inotify-based watcher that scans new files in download directories as they arrive |
+| `malware-weekly.sh` | Weekly full-system ClamAV scan |
+| `yara-update.sh` | Pulls updated YARA rules from community sources |
+| `rkhunter-weekly.sh` | Weekly rootkit hunter scan |
+| `trivy-weekly.sh` | Weekly Trivy CVE scan against running container images |
+
+### Dashboard and service setup (one-time)
+
+| Script | What it does |
+| :--- | :--- |
+| `homarr-seed-apps.sh` | Seeds all services into Homarr via API — run once after a fresh install |
+| `homarr-add-monitoring.sh` | Adds monitoring apps to Homarr; separate from the main seed for incremental adds |
+| `duplicati-seed-backups.sh` | Seeds Duplicati backup jobs via API — requires `DUPLICATI_API_KEY` |
+| `ntfy-deploy.sh` | Configures ntfy notification topics and access controls |
+
+### Knowledge and AI
+
+| Script | What it does |
+| :--- | :--- |
+| `kiwix-stage-download.sh` | Downloads Kiwix ZIM files for offline knowledge bases |
+| `ingest-rag.py` | Ingests documents into the local vector database (Qdrant) |
+| `upload-rag-kiwix.py` | Processes Kiwix ZIM content and uploads extracted text to the RAG pipeline |
+| `rag-status.sh` | Shows collection sizes and indexing status for the RAG vector store |
+
+The `scripts/ref/` folder contains earlier versions of some scripts kept for reference — not active, not required.
+
+---
+
 ## Hardware
 
 | Component | What's running here |
@@ -83,4 +138,10 @@ Not required to start. See [GETTING_STARTED.md](GETTING_STARTED.md) for what act
 
 ## Contributing / Questions
 
-Issues and PRs welcome. If something in the configs is wrong, unclear, or has a better way — open an issue.
+Issues and PRs are welcome. This repo is shared to be useful — if something's wrong, unclear, or could be done better, a contribution is genuinely appreciated.
+
+Documentation is especially welcome. If you ran through this and something was confusing, missing, or out of date, fixing it is one of the most valuable things you can do. A paragraph that explains something someone will spend an hour Googling is worth as much as a code change.
+
+If you want to add a script or service config: keep it env-var based (no hardcoded IPs or domains), and make sure it works standalone without requiring the rest of the stack.
+
+Questions are welcome as issues too — if something isn't clear from the docs, that's a gap worth knowing about.
