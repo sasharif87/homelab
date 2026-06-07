@@ -69,8 +69,9 @@ services:
     environment:
       - TZ=America/Chicago
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+      - MOUSEHOLE_AUTH_PASSWORD=${MOUSEHOLE_AUTH_PASSWORD}
     volumes:
-      - /mnt/apps/mousehole:/srv/mousehole
+      - /mnt/apps/mousehole:/var/lib/mousehole
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
