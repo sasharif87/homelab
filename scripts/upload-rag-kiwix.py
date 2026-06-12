@@ -24,6 +24,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 from collections import deque
@@ -338,6 +339,19 @@ def _worker_upload(api_key, collection_id, url, text):
     return upload_article(sess, api_key, collection_id, url, text)
 
 
+def purge_file_collections(file_ids):
+    """Delete per-file ChromaDB collections via docker exec (OW's own delete leaves empty shells)."""
+    if not file_ids:
+        return
+    names = ",".join(f'"file-{fid}"' for fid in file_ids)
+    script = (
+        "import chromadb; c=chromadb.PersistentClient(path='/app/backend/data/vector_db');\n"
+        f"[c.delete_collection(n) for n in [{names}] if any(col.name==n for col in c.list_collections())]"
+    )
+    subprocess.run(["docker", "exec", "open-webui", "python3", "-c", script],
+                   capture_output=True, timeout=30)
+
+
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -494,6 +508,8 @@ def main():
                     effective_cap = cap
                     break
 
+            cleanup_queue = []   # file_ids pending ChromaDB collection purge
+
             with ThreadPoolExecutor(max_workers=args.workers) as pool:
                 pending  = {}   # future -> (url, label)
                 gen      = crawl_zim(session, book["path"], already)
@@ -515,11 +531,14 @@ def main():
                         try:
                             file_id = f.result()
                             col_state["uploaded"][url] = file_id
+                            cleanup_queue.append(file_id)
                             uploaded_total += 1
                             zim_count += 1
                             print(f"    [OK #{uploaded_total:>5}] {label}")
                             if uploaded_total % BATCH_SIZE == 0:
                                 save_state(state)
+                                purge_file_collections(cleanup_queue)
+                                cleanup_queue.clear()
                         except Exception as exc:
                             print(f"    [FAIL] {url}: {exc}", file=sys.stderr)
                             failed_total += 1
@@ -543,6 +562,8 @@ def main():
                         pending.clear()
                         break
 
+            purge_file_collections(cleanup_queue)
+            cleanup_queue.clear()
             save_state(state)
             print(f"    ZIM done — {zim_count} new articles")
 

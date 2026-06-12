@@ -5,7 +5,6 @@ services:
     restart: unless-stopped
     environment:
       - WEBSOCKET_ENABLED=true
-      - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}
       - SIGNUPS_ALLOWED=false
       - DOMAIN=https://vaultwarden.${DOMAIN}
     ports:

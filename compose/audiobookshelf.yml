@@ -9,4 +9,5 @@ services:
       - /mnt/apps/appdata/audiobookshelf:/config
       - /mnt/storage/media/audiobooks:/audiobooks
       - /mnt/storage/media/ebooks:/ebooks
+      - /mnt/storage/downloads/books:/downloads-books:ro
 

@@ -17,7 +17,7 @@ services:
       - TZ=America/Chicago
     volumes:
       - /mnt/storage/media/youtube:/youtube
-      - /mnt/apps/appdata/tubearchivist/cache:/cache
+      - /mnt/docker-local/appdata/tubearchivist/cache:/cache
     depends_on:
       - tubearchivist-es
       - tubearchivist-redis

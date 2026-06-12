@@ -4,7 +4,9 @@ ingest-rag.py — ZIM → Qdrant ingestion for Open WebUI
 
 Reads ZIM files directly via libzim (no Kiwix HTTP server required),
 chunks articles, embeds via Ollama nomic-embed-text, and writes vectors
-straight into Qdrant under the Open WebUI knowledge collection UUID.
+directly into open-webui_knowledge with the payload format OW expects:
+  - top-level tenant_id: "knowledge-bases"
+  - metadata.knowledge_base_id: <OW collection UUID>
 No per-file ChromaDB churn. Fully resumable.
 
 Usage:
@@ -66,13 +68,14 @@ _DISCORD_RED    = 16711680  # failure
 
 EMBED_MODEL   = "nomic-embed-text"
 EMBED_DIM     = 768
+TARGET_COL    = "open-webui_knowledge"   # OW's single managed collection — all chunks go here
 CHUNK_CHARS   = 1600   # ~400 tokens at ~4 chars/token
 CHUNK_OVERLAP = 200
 MIN_TEXT_LEN  = 150
 MAX_TEXT_LEN  = 16000
 EMBED_BATCH   = 256    # texts per Ollama /api/embed call
 QDRANT_BATCH  = 512    # points per Qdrant upsert
-TMP_BASE      = "/mnt/storage/knowledge/zim-tmp"  # scratch space for phase-A HTML
+TMP_BASE      = "/mnt/docker-local/zim-tmp"  # scratch space for phase-A HTML (local NVMe — faster than NFS for many small files)
 
 # Phase B is a 3-stage pipeline (producer → embed consumer → upsert) so the GPU
 # embeds back-to-back instead of stalling on file-read/lxml-parse/upsert.
@@ -219,7 +222,7 @@ COLLECTIONS = [
             "electronics.stackexchange", "physics.stackexchange",
             "chemistry.stackexchange", "biology.stackexchange",
             "3dprinting.stackexchange", "datascience_stackexchange",
-            "ham.stackexchange", "freecodecamp", "ifixit", "restarters",
+            "ham.stackexchange", "ifixit", "restarters",
             "gutenberg_en_lcc-t", "gutenberg_en_lcc-q",
         ],
         "caps": {
@@ -235,36 +238,46 @@ COLLECTIONS = [
         },
     },
     {
-        "name": "Kiwix — Practical & Reference",
+        "name": "Kiwix — Practical Skills",
         "desc": (
-            "Practical skills and general reference: DIY, Woodworking, Mechanics, "
-            "Gardening, Cooking, Sustainability, CD3WD, Low-tech Magazine, Appropedia, "
-            "Survival/Prepper content, Wikipedia (Simple + capped Full), Wikibooks, "
-            "Wikiversity, Wikivoyage, wikiHow, Gutenberg (general + agriculture/literature)."
+            "Hands-on how-to and practical skills: wikiHow, DIY, Woodworking, Mechanics, "
+            "Gardening, Cooking, Sustainability Stack Exchange, FOSS Cooking. "
+            "Homesteading and low-tech living: Appropedia, CD3WD, Low-tech Magazine, "
+            "Urban Prepper, post-disaster/water/food/knots guides, "
+            "Gutenberg agriculture and natural history (LCC-S)."
         ),
         "match": [
+            "wikihow",
             "diy.stackexchange", "woodworking.stackexchange",
             "mechanics.stackexchange", "gardening.stackexchange",
             "sustainability.stackexchange", "cooking.stackexchange",
+            "foss_cooking",
             "cd3wdproject", "solar.lowtechmagazine", "zimgit-post-disaster",
             "urban-prepper", "zimgit-food-preparation", "zimgit-water",
-            "zimgit-knots", "appropedia", "foss_cooking",
-            "wikipedia_en_simple", "wikipedia_en_all",
-            "wikibooks", "wikiversity", "wikivoyage", "wikihow",
-            "gutenberg_en_all", "gutenberg_en_lcc-l", "gutenberg_en_lcc-s",
-            "gutenberg_en_lcc-k", "wiktionary",
+            "zimgit-knots", "appropedia",
+            "gutenberg_en_lcc-s",
         ],
         "caps": {
-            "wikipedia_en_simple":  100_000,
-            "wikipedia_en_all":     100_000,
-            "diy.stackexchange":    100_000,
-            "wikibooks":            100_000,
-            "wikihow":              100_000,
-            "wikiversity":          100_000,
-            "gutenberg_en_all":      10_000,
-            "gutenberg_en_lcc-l":     5_000,
-            "gutenberg_en_lcc-k":     1_000,
-            "gutenberg_en_lcc-s":   100_000,
+            "wikihow":            100_000,
+            "diy.stackexchange":  100_000,
+            "gutenberg_en_lcc-s": 100_000,
+        },
+    },
+    {
+        "name": "Kiwix — General Reference",
+        "desc": (
+            "Encyclopedic general knowledge: Wikipedia (full + Simple English), "
+            "Wikibooks, Wikiversity, Wikivoyage, Wiktionary."
+        ),
+        "match": [
+            "wikipedia_en_simple", "wikipedia_en_all",
+            "wikibooks", "wikiversity", "wikivoyage", "wiktionary",
+        ],
+        "caps": {
+            "wikipedia_en_simple": 100_000,
+            "wikipedia_en_all":    100_000,
+            "wikibooks":           100_000,
+            "wikiversity":         100_000,
         },
     },
 ]
@@ -436,44 +449,37 @@ def embed_texts(session: requests.Session, texts: list[str], ollama_url: str) ->
 
 # ── qdrant ────────────────────────────────────────────────────────────────────
 
-def ensure_qdrant_collection(qdrant_url: str, collection_id: str):
-    t0 = time.monotonic()
-    resp = requests.get(f"{qdrant_url}/collections/{collection_id}", timeout=10)
-    if resp.status_code == 200:
-        info = resp.json().get("result", {})
-        points = info.get("vectors_count", info.get("points_count", "?"))
-        log.info("Qdrant collection exists: %s  (%s vectors)", collection_id, points)
-        return
-
-    log.info("Creating Qdrant collection: %s  (dim=%d, Cosine)", collection_id, EMBED_DIM)
-    payload = {
-        "vectors": {
-            "size": EMBED_DIM,
-            "distance": "Cosine",
-            "on_disk": True,
-        },
-        "on_disk_payload": True,
-    }
-    resp = requests.put(
-        f"{qdrant_url}/collections/{collection_id}",
-        json=payload,
-        timeout=30,
-    )
-    if not resp.ok:
-        log.error("Failed to create Qdrant collection: HTTP %s — %s",
-                  resp.status_code, resp.text[:300])
-        resp.raise_for_status()
-    log.info("Qdrant collection created in %.2fs", time.monotonic() - t0)
+def ensure_qdrant_collection(qdrant_url: str):
+    """Verify TARGET_COL exists at the right dimension. OW owns it — don't recreate."""
+    resp = requests.get(f"{qdrant_url}/collections/{TARGET_COL}", timeout=10)
+    if resp.status_code != 200:
+        log.error(
+            "%s not found. Ensure Open WebUI is running with %s as the embedding model "
+            "(Admin → Settings → Documents), then re-run.",
+            TARGET_COL, EMBED_MODEL,
+        )
+        sys.exit(1)
+    info = resp.json().get("result", {})
+    dim  = info.get("config", {}).get("params", {}).get("vectors", {}).get("size")
+    pts  = info.get("points_count", "?")
+    if dim != EMBED_DIM:
+        log.error(
+            "%s is %d-dim, expected %d. Change OW embedding model to %s "
+            "in Admin → Settings → Documents, save, then re-run.",
+            TARGET_COL, dim, EMBED_DIM, EMBED_MODEL,
+        )
+        sys.exit(1)
+    log.info("Target %s: %d-dim OK  (%s existing points)", TARGET_COL, dim, pts)
 
 
-def upsert_points(qdrant_url: str, collection_id: str, points: list[dict]):
+def upsert_points(qdrant_url: str, points: list[dict]):
     total = len(points)
     upserted = 0
     for i in range(0, total, QDRANT_BATCH):
         batch = points[i:i + QDRANT_BATCH]
         t0 = time.monotonic()
         resp = requests.put(
-            f"{qdrant_url}/collections/{collection_id}/points",
+            f"{qdrant_url}/collections/{TARGET_COL}/points",
             json={"points": batch},
             params={"wait": "false"},
             timeout=60,
@@ -877,7 +883,7 @@ def crawl_to_disk(zim_stem: str, kiwix_base: str, out_dir: Path,
 
 # ── phase B: embed from disk ──────────────────────────────────────────────────
 
-def embed_from_disk(out_dir: Path, zim_name: str, collection_id: str,
+def embed_from_disk(out_dir: Path, zim_name: str, knowledge_base_id: str,
                     cap: int, args) -> tuple[int, int]:
     """
     Pipelined Phase B.  Three stages run concurrently so the GPU embeds
@@ -947,7 +953,9 @@ def embed_from_disk(out_dir: Path, zim_name: str, collection_id: str,
                         {"text": chunk,
                          "metadata": {"source": art_url, "name": art_title or art_url,
                                       "zim": zim_name, "chunk_id": ci,
-                                      "vote_score": vote_score}},
+                                      "vote_score": vote_score,
+                                      "knowledge_base_id": knowledge_base_id},
+                         "tenant_id": "knowledge-bases"},
                     ))
                     if len(batch) >= EMBED_BATCH:
                         embed_q.put(batch)        # blocks when GPU is behind (backpressure)
@@ -983,7 +991,7 @@ def embed_from_disk(out_dir: Path, zim_name: str, collection_id: str,
             if points is DONE:
                 break
             try:
-                upsert_points(args.qdrant_url, collection_id, points)
+                upsert_points(args.qdrant_url, points)
                 stats["chunks"] += len(points)
             except Exception as exc:
                 stats["upsert_errs"] += 1
@@ -1093,7 +1101,7 @@ def process_zim(
     ]
     log.info("Phase B subprocess: %s", zim_name)
     try:
-        proc = subprocess.run(cmd, timeout=7200,
+        proc = subprocess.run(cmd, timeout=None,
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if proc.stdout:
             for line in proc.stdout.decode("utf-8", errors="replace").splitlines():
@@ -1341,6 +1349,8 @@ def cmd_ingest(args):
     grand_chunks   = 0
     run_start      = time.monotonic()
 
+    ensure_qdrant_collection(args.qdrant_url)
+
     for col_def in COLLECTIONS:
         col_name  = col_def["name"]
         col_zims  = assigned[col_name]
@@ -1358,7 +1368,6 @@ def cmd_ingest(args):
         collection_id = ensure_webui_collection(
             session, api_key, col_state, col_name, col_def["desc"], args.webui_url,
         )
-        ensure_qdrant_collection(args.qdrant_url, collection_id)
         save_state(state)
 
         col_start    = time.monotonic()
@@ -1521,7 +1530,7 @@ def main():
         arts, chunks = embed_from_disk(
             out_dir=Path(args._pb_out_dir),
             zim_name=args._pb_zim_name,
-            collection_id=args._pb_collection_id,
+            knowledge_base_id=args._pb_collection_id,
             cap=args._pb_cap,
             args=args,
         )
