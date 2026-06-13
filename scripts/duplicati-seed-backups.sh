@@ -1,10 +1,11 @@
 #!/bin/bash
 # Create Duplicati backup jobs via API
-# Encryption passphrase: iJqb6FTaoWEp1a4KelbpMtTbgQrCfELt  ← save this to Vaultwarden
+# Requires DUPLICATI_WEBPASSWORD and DUPLICATI_BACKUP_PASSPHRASE in the environment
+# (see Docs/secrets.md)
 
 DUPLICATI="http://localhost:8200"
-WEBPASSWORD="changeme"
-PASSPHRASE="iJqb6FTaoWEp1a4KelbpMtTbgQrCfELt"
+WEBPASSWORD="${DUPLICATI_WEBPASSWORD:?Set DUPLICATI_WEBPASSWORD}"
+PASSPHRASE="${DUPLICATI_BACKUP_PASSPHRASE:?Set DUPLICATI_BACKUP_PASSPHRASE}"
 
 # Get access token
 TOKEN=$(curl -s -X POST "$DUPLICATI/api/v1/auth/login" \
@@ -53,4 +54,4 @@ create_backup "Appdata Daily" "/backups/appdata" '[ "/source/appdata" ]' "3"
 create_backup "Config Daily"  "/backups/config"  '[ "/source/compose", "/source/npm" ]' "3:15"
 
 echo ""
-echo "Passphrase (save to Vaultwarden): iJqb6FTaoWEp1a4KelbpMtTbgQrCfELt"
+echo "Done. Passphrase used was read from DUPLICATI_BACKUP_PASSPHRASE — confirm it matches Docs/secrets.md / Vaultwarden."
