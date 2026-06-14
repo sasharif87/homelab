@@ -5,6 +5,7 @@ After=docker.service
 [Service]
 Type=oneshot
 ExecStart=/opt/scripts/trivy-weekly.sh
+EnvironmentFile=/etc/container-watchdog.env
 User=root
 StandardOutput=journal
 StandardError=journal
