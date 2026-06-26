@@ -9,7 +9,12 @@ services:
       - PUID=1000
       - PGID=1000
       - APP_KEY=${SPEEDTEST_APP_KEY}
-      - DB_CONNECTION=sqlite
+      - DB_CONNECTION=pgsql
+      - DB_HOST=${SERVER_IP}
+      - DB_PORT=5432
+      - DB_DATABASE=speedtest
+      - DB_USERNAME=speedtest
+      - DB_PASSWORD=${SPEEDTEST_DB_PASSWORD}
       - SPEEDTEST_SCHEDULE=0 * * * *
       - DISPLAY_TIMEZONE=America/Chicago
     volumes:

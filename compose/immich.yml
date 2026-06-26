@@ -58,6 +58,6 @@ services:
       POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
       POSTGRES_DB: immich
     volumes:
-      - /mnt/docker-local/appdata/immich/db:/var/lib/postgresql/data
+      - /mnt/apps/appdata/immich/db:/var/lib/postgresql/data
     labels:
       - com.centurylinklabs.watchtower.enable=false

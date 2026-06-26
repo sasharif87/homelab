@@ -3,8 +3,9 @@ services:
     image: ghcr.io/sysadminsmedia/homebox:latest
     container_name: homebox
     restart: unless-stopped
+    environment:
+      - HBOX_AUTH_API_KEY_PEPPER=${HOMEBOX_API_KEY_PEPPER}
     ports:
       - 7745:7745
     volumes:
       - /mnt/apps/appdata/homebox:/data
-

@@ -1,6 +1,6 @@
 services:
   watchtower:
-    image: containrrr/watchtower:latest
+    image: nickfedor/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
     environment:
@@ -11,3 +11,4 @@ services:
       - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL} ${WATCHTOWER_NTFY_URL}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro

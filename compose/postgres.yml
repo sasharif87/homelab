@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - TZ=America/Chicago
+    volumes:
+      - /mnt/apps/appdata/postgres:/var/lib/postgresql/data

@@ -1,6 +1,7 @@
 services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
+    init: true
     container_name: uptime-kuma
     restart: unless-stopped
     ports:

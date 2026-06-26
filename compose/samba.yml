@@ -1,16 +1,36 @@
+# Migrated off abandoned dperson/samba (EOL OpenSSL 1.1.1, ~5yr stale) to the
+# maintained ServerContainers/samba image.
+#
+# Config translation from the old dperson flags:
+#   -u "user;$SAMBA_PASSWORD"                  -> ACCOUNT_<user>
+#   -s "storage;/mnt/storage;yes;no;no;user"   -> SAMBA_VOLUME_CONFIG_storage
+#       (name;path;browseable;readonly;guest;users)
+#   -g "force user = root"                      -> kept on the share (behavior unchanged)
+#
+# Perf fixes: host networking (no docker-proxy on 445), SMB signing off,
+# aio + socket tuning.
 services:
   samba:
-    image: dperson/samba:latest
+    image: ghcr.io/servercontainers/samba:latest
     container_name: samba
     restart: unless-stopped
-    ports:
-      - "445:445"
-      - "139:139"
+    network_mode: host
+    hostname: samba
     environment:
       - TZ=America/Chicago
-    command: >
-      -u "${SAMBA_USER};${SAMBA_PASSWORD}"
-      -s "storage;/mnt/storage;yes;no;no;${SAMBA_USER}"
-      -g "force user = root"
+      - WSDD2_DISABLE=true
+      - AVAHI_DISABLE=true
+      # --- user ---
+      - ACCOUNT_${SAMBA_USER}=${SAMBA_PASSWORD}
+      # --- share ---
+      - SAMBA_VOLUME_CONFIG_storage=[storage]; path = /mnt/storage; valid users = ${SAMBA_USER}; guest ok = no; read only = no; browseable = yes; force user = root
+      # --- global perf tuning ---
+      - SAMBA_GLOBAL_CONFIG_server_SPACE_signing=no
+      - SAMBA_GLOBAL_CONFIG_client_SPACE_signing=no
+      - SAMBA_GLOBAL_CONFIG_aio_SPACE_read_SPACE_size=1
+      - SAMBA_GLOBAL_CONFIG_aio_SPACE_write_SPACE_size=1
+      - SAMBA_GLOBAL_CONFIG_socket_SPACE_options=TCP_NODELAY
+      - SAMBA_GLOBAL_CONFIG_min_SPACE_receivefile_SPACE_size=16384
+      - SAMBA_GLOBAL_CONFIG_use_SPACE_sendfile=yes
     volumes:
       - /mnt/storage:/mnt/storage

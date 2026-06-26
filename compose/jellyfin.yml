@@ -12,8 +12,8 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=false
     volumes:
-      - /mnt/docker-local/appdata/jellyfin:/config
-      - /mnt/docker-local/transcodes:/transcodes
+      - /mnt/apps/appdata/jellyfin:/config
+      - /mnt/storage/transcodes:/transcodes
       - /mnt/storage/media:/media:ro
       - /mnt/storage/media/tv:/tv:ro
       - /mnt/storage/media/movies:/movies:ro

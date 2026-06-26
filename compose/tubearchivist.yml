@@ -17,7 +17,7 @@ services:
       - TZ=America/Chicago
     volumes:
       - /mnt/storage/media/youtube:/youtube
-      - /mnt/docker-local/appdata/tubearchivist/cache:/cache
+      - /mnt/storage/downloads/tubearchivist-cache:/cache
     depends_on:
       - tubearchivist-es
       - tubearchivist-redis
@@ -33,14 +33,17 @@ services:
       - ES_JAVA_OPTS=-Xms2g -Xmx2g
       - xpack.security.enabled=true
       - discovery.type=single-node
-      - cluster.routing.allocation.disk.threshold_enabled=false
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.flood_stage=1gb
+      - cluster.routing.allocation.disk.watermark.high=2gb
+      - cluster.routing.allocation.disk.watermark.low=3gb
       - path.repo=/usr/share/elasticsearch/data/snapshot
     ulimits:
       memlock:
         soft: -1
         hard: -1
     volumes:
-      - /mnt/docker-local/appdata/tubearchivist/es:/usr/share/elasticsearch/data
+      - /mnt/apps/appdata/tubearchivist/es:/usr/share/elasticsearch/data
     labels:
       - com.centurylinklabs.watchtower.enable=false
 

@@ -70,6 +70,7 @@ services:
       - TZ=America/Chicago
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - MOUSEHOLE_AUTH_PASSWORD=${MOUSEHOLE_AUTH_PASSWORD}
+      - MOUSEHOLE_ALLOWED_HOSTS=localhost,127.0.0.1,${SERVER_IP}
     volumes:
       - /mnt/apps/mousehole:/var/lib/mousehole
 
