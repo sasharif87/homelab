@@ -11,7 +11,7 @@ datasources:
   - name: PostgreSQL
     type: postgres
     access: proxy
-    url: ${SERVER_IP}:5432
+    url: <server-ip>:5432
     user: grafana_ro
     secureJsonData:
       password: ${GRAFANA_POSTGRES_PASSWORD}

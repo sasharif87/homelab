@@ -1,13 +1,12 @@
 services:
   ntfy:
     image: binwiederhier/ntfy:latest
+    init: true
     container_name: ntfy
     restart: unless-stopped
     command: serve
     environment:
       - TZ=America/Chicago
-      # server.yml at /mnt/apps/appdata/ntfy/config/server.yml
-      # auth-default-access: deny-all — user created via: docker exec ntfy ntfy user add --role=admin <username>
     volumes:
       - /mnt/apps/appdata/ntfy/config:/etc/ntfy
       - /mnt/apps/appdata/ntfy/data:/var/lib/ntfy

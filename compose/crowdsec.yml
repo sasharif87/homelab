@@ -1,6 +1,7 @@
 services:
   crowdsec:
     image: crowdsecurity/crowdsec:latest
+    init: true
     container_name: crowdsec
     restart: unless-stopped
     environment:

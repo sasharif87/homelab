@@ -1,6 +1,7 @@
 services:
   homarr:
     image: ghcr.io/homarr-labs/homarr:latest
+    init: true
     container_name: homarr
     restart: unless-stopped
     ports:

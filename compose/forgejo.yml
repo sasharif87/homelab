@@ -1,6 +1,7 @@
 services:
   forgejo:
     image: codeberg.org/forgejo/forgejo:15
+    init: true
     container_name: forgejo
     restart: unless-stopped
     environment:

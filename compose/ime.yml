@@ -10,6 +10,7 @@
 services:
   nginx:
     image: ghcr.io/sasharif87/ime-nginx:latest
+    init: true
     restart: unless-stopped
     ports:
       - "8081:80"
@@ -26,6 +27,7 @@ services:
 
   ime-frontend:
     image: ghcr.io/sasharif87/ime-frontend:latest
+    init: true
     restart: unless-stopped
     networks:
       - ime_frontend
@@ -37,6 +39,7 @@ services:
 
   ime-backend:
     image: ghcr.io/sasharif87/ime-backend:latest
+    init: true
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -84,6 +87,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    init: true
     restart: unless-stopped
     environment:
       POSTGRES_DB: ime
@@ -106,6 +110,7 @@ services:
 
   chromadb:
     image: chromadb/chroma:latest
+    init: true
     restart: unless-stopped
     environment:
       IS_PERSISTENT: "TRUE"
@@ -122,6 +127,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    init: true
     restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
@@ -141,6 +147,7 @@ services:
 
   migrate:
     image: ghcr.io/sasharif87/ime-backend:latest
+    init: true
     entrypoint: ["alembic", "upgrade", "head"]
     environment:
       DATABASE_URL: postgresql+asyncpg://ime:${POSTGRES_PASSWORD}@postgres:5432/ime

@@ -8,7 +8,7 @@ services:
       - DOCKER_API_VERSION=1.45
       - WATCHTOWER_SCHEDULE=0 0 4 * * 0
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL} ${WATCHTOWER_NTFY_URL}
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL} ${WATCHTOWER_NTFY_URL} generic+http://<server-ip>:5678/webhook/watchtower-triage
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /root/.docker/config.json:/config.json:ro

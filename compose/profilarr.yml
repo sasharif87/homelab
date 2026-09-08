@@ -1,6 +1,7 @@
 services:
   profilarr:
     image: ghcr.io/dictionarry-hub/profilarr:latest
+    init: true
     container_name: profilarr
     restart: unless-stopped
     ports:

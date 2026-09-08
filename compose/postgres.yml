@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    init: true
     container_name: postgres
     restart: unless-stopped
     ports:

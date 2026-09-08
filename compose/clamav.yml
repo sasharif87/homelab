@@ -3,6 +3,13 @@ services:
     image: clamav/clamav:latest
     container_name: clamav
     restart: unless-stopped
+    # Was 1g, which OOM-killed clamd during signature load (verified Aug 3 2026:
+    # OOMKilled=true, container still reporting "healthy" because the healthcheck only
+    # tests that the socket file exists — clamdscan got "Connection refused" while
+    # clamscan found EICAR fine). clamd holds the entire signature set resident:
+    # main.cvd 89M + daily.cld 87M on disk expands to roughly 2G in memory.
+    mem_limit: 3g
+    cpus: 1.0
     environment:
       - TZ=America/Chicago
       - CLAMD_CONF_MaxFileSize=500M

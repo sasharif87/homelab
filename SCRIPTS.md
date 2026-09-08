@@ -6,7 +6,18 @@ The startup sequence, the watchdogs, the boot checks — none of them existed or
 
 The goal isn't a polished automation framework. It's that when something breaks — and it will — the recovery is a `git clone` and a few commands, not a weekend of archaeology.
 
-All scripts live in `scripts/`. They require no framework — just bash or Python 3.
+Scripts live under `scripts/`, grouped by what they do. They require no framework — just bash or Python 3.
+
+| Directory | Contents |
+| :--- | :--- |
+| `scripts/boot/` | Startup sequence — preflight checks, staged container startup, reboot handling |
+| `scripts/security/` | Malware scanning, rootkit checks, image CVE scanning, rootfs guard |
+| `scripts/ai/` | RAG ingestion, Kiwix staging, Ollama and Open WebUI tooling |
+| `scripts/media/` | Library maintenance, TubeArchivist, VPN port forwarding |
+| `scripts/infra/` | GPU health, notification setup, connectivity tests |
+| `scripts/backup/` | Sanoid install and the Duplicati job seeder |
+| `scripts/home/` | Homarr and Homebox dashboard seeding |
+| `scripts/systemd/` | Unit and timer files for everything scheduled |
 
 Systemd unit files for the scheduled ones are in `scripts/systemd/`. To install one:
 
@@ -78,7 +89,7 @@ These seed configuration into running services via their APIs. Run them once aft
 `homarr-seed-apps.sh` uses env vars for all IPs — pass them inline or via `.env`:
 
 ```bash
-SERVER_IP=192.168.x.x PROXMOX_IP=192.168.x.x HOMARR_API_KEY=<key> bash scripts/homarr-seed-apps.sh
+SERVER_IP=192.168.x.x PROXMOX_IP=192.168.x.x HOMARR_API_KEY=<key> bash scripts/home/homarr-seed-apps.sh
 ```
 
 ---
@@ -98,6 +109,5 @@ These require Qdrant and Ollama to be running. `ingest-rag.py` and `upload-rag-k
 
 ## Notes
 
-- `scripts/ref/` contains earlier versions of some scripts kept for reference — not active, not required.
 - Scripts that send notifications use `ntfy` — the topic and server URL come from env vars (`NTFY_URL`, `NTFY_TOPIC`).
 - Nothing here requires root except the systemd unit installs and the malware scanner setup.

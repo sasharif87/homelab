@@ -1,6 +1,7 @@
 services:
   homebox:
     image: ghcr.io/sysadminsmedia/homebox:latest
+    init: true
     container_name: homebox
     restart: unless-stopped
     environment:

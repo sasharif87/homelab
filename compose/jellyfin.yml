@@ -1,12 +1,13 @@
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
+    init: true
     container_name: jellyfin
     restart: unless-stopped
     runtime: nvidia
     network_mode: host
     environment:
-      - JELLYFIN_PublishedServerUrl=http://${SERVER_IP}
+      - JELLYFIN_PublishedServerUrl=http://<server-ip>
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
     labels:

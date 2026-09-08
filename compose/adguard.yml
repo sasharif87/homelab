@@ -1,6 +1,7 @@
 services:
   adguard:
     image: adguard/adguardhome:latest
+    init: true
     container_name: adguard
     restart: unless-stopped
     ports:

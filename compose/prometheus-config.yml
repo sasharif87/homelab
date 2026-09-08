@@ -9,4 +9,4 @@ scrape_configs:
       format: [prometheus]
     honor_labels: true
     static_configs:
-      - targets: ['${PROXMOX_IP}:19999']
+      - targets: ['<proxmox-ip>:19999']

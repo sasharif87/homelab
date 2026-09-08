@@ -1,15 +1,18 @@
 services:
   vaultwarden:
     image: vaultwarden/server:latest
+    init: true
     container_name: vaultwarden
     restart: unless-stopped
     environment:
-      - WEBSOCKET_ENABLED=true
+      # NOTE: WEBSOCKET_ENABLED and the standalone :3012 port were removed
+      # upstream in Vaultwarden 1.30 — the notifications hub is now served on
+      # the main HTTP port at /notifications/hub. Requires the reverse proxy to
+      # forward Upgrade/Connection headers (NPM: "Websockets Support" on).
       - SIGNUPS_ALLOWED=false
       - DOMAIN=https://vaultwarden.${DOMAIN}
     ports:
       - 8080:80
-      - 3012:3012
     volumes:
       - /mnt/apps/appdata/vaultwarden:/data
     labels:

@@ -13,4 +13,3 @@ services:
     volumes:
       - /mnt/apps/appdata/calibre:/config
       - /mnt/storage/media/ebooks:/books
-      - /mnt/storage/downloads:/downloads

@@ -1,0 +1,12 @@
+[Unit]
+Description=Scheduled VM maintenance reboot with Discord notification
+After=network.target
+ConditionPathExists=!/run/preflight-reboot-scheduled
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/vm-reboot.sh "Weekly maintenance reboot"
+EnvironmentFile=/etc/container-watchdog.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vm-reboot

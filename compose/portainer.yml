@@ -1,6 +1,7 @@
 services:
   portainer:
     image: portainer/portainer-ce:latest
+    init: true
     container_name: portainer
     restart: unless-stopped
     ports:

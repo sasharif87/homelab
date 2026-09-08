@@ -1,12 +1,15 @@
 services:
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
+    init: true
     container_name: audiobookshelf
     restart: unless-stopped
+    user: "1000:1000"
     ports:
       - 13378:80
     volumes:
       - /mnt/apps/appdata/audiobookshelf:/config
+      - /mnt/apps/appdata/audiobookshelf/metadata:/metadata
       - /mnt/storage/media/audiobooks:/audiobooks
       - /mnt/storage/media/ebooks:/ebooks
       - /mnt/storage/downloads/books:/downloads-books:ro

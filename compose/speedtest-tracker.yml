@@ -10,7 +10,7 @@ services:
       - PGID=1000
       - APP_KEY=${SPEEDTEST_APP_KEY}
       - DB_CONNECTION=pgsql
-      - DB_HOST=${SERVER_IP}
+      - DB_HOST=<server-ip>
       - DB_PORT=5432
       - DB_DATABASE=speedtest
       - DB_USERNAME=speedtest

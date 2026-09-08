@@ -1,6 +1,7 @@
 services:
   navidrome:
     image: deluan/navidrome:latest
+    init: true
     container_name: navidrome
     restart: unless-stopped
     ports:

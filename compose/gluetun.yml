@@ -12,12 +12,13 @@ services:
       - 9696:9696      # Prowlarr
       - 8989:8989      # Sonarr
       - 7878:7878      # Radarr
-      - 5299:5299      # LazyLibrarian
+      - 8788:8788      # Bookshelf-eBook
       - 8686:8686      # Lidarr
       - 6767:6767      # Bazarr
       - 8191:8191      # FlareSolverr
       - 5010:5010      # Mousehole
       - 2468:2468      # Cross-seed
+      - 8787:8787      # Bookshelf
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
@@ -32,7 +33,7 @@ services:
       - DNS_UPSTREAM_TYPE=plain
       - DNS_UPSTREAM_PLAIN_ADDRESSES=1.1.1.1:53
       - WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL=25s
-      - FIREWALL_OUTBOUND_SUBNETS=172.16.0.0/12,${LAN_SUBNET}
+      - FIREWALL_OUTBOUND_SUBNETS=172.16.0.0/12,192.168.x.0/24
     volumes:
       - /mnt/apps/gluetun:/gluetun
     labels:
@@ -50,9 +51,9 @@ services:
       - PGID=1000
       - TZ=America/Chicago
       - WEBUI_PORT=8080
-      - WEBUI_HOSTNAMEMAP=${SERVER_IP}:8082
+      - WEBUI_HOSTNAMEMAP=<server-ip>:8082
     volumes:
-      - /mnt/apps/qbittorrent:/config
+      - /mnt/docker-local/appdata-local/qbittorrent:/config
       - /mnt/storage/downloads:/downloads
       - /mnt/storage/media/tv:/tv
       - /mnt/storage/media/movies:/movies
@@ -70,7 +71,7 @@ services:
       - TZ=America/Chicago
       - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
       - MOUSEHOLE_AUTH_PASSWORD=${MOUSEHOLE_AUTH_PASSWORD}
-      - MOUSEHOLE_ALLOWED_HOSTS=localhost,127.0.0.1,${SERVER_IP}
+      - MOUSEHOLE_ALLOWED_HOSTS=localhost,127.0.0.1,<server-ip>
     volumes:
       - /mnt/apps/mousehole:/var/lib/mousehole
 
@@ -99,7 +100,7 @@ services:
       - PROWLARR__PORT=9696
       - PROWLARR__BIND=0.0.0.0
     volumes:
-      - /mnt/apps/prowlarr:/config
+      - /mnt/docker-local/appdata-local/prowlarr:/config
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -113,7 +114,7 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - /mnt/apps/sonarr:/config
+      - /mnt/docker-local/appdata-local/sonarr:/config
       - /mnt/storage/media/tv:/tv
       - /mnt/storage/downloads:/downloads
 
@@ -129,13 +130,15 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - /mnt/apps/radarr:/config
+      - /mnt/docker-local/appdata-local/radarr:/config
       - /mnt/storage/media/movies:/movies
       - /mnt/storage/downloads:/downloads
 
-  lazylibrarian:
-    image: lscr.io/linuxserver/lazylibrarian:latest
-    container_name: lazylibrarian
+  # Audio-only instance. Port 8787. Root folder /audiobooks, quality profile "Spoken".
+  # Deliberately does NOT mount /ebooks so it can never import text formats.
+  bookshelf:
+    image: ghcr.io/klein1jo/bookshelf:hardcover-v0.4.21.3
+    container_name: bookshelf
     restart: unless-stopped
     network_mode: "service:gluetun"
     depends_on:
@@ -144,12 +147,34 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
-      - DOCKER_MODS=linuxserver/mods:lazylibrarian-ffmpeg
+      - METADATA_URL=http://<server-ip>:8789
     volumes:
-      - /mnt/apps/lazylibrarian:/config
-      - /mnt/storage/media/ebooks:/ebooks
+      - /mnt/docker-local/appdata-local/bookshelf:/config
       - /mnt/storage/media/audiobooks:/audiobooks
       - /mnt/storage/downloads:/downloads
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+
+  # eBook-only instance. Port 8788 (set in its config.xml). Root folder /ebooks,
+  # quality profile "eBook". /ebooks is also the Calibre library root.
+  bookshelf-ebook:
+    image: ghcr.io/klein1jo/bookshelf:hardcover-v0.4.21.3
+    container_name: bookshelf-ebook
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - METADATA_URL=http://<server-ip>:8789
+    volumes:
+      - /mnt/docker-local/appdata-local/bookshelf-ebook:/config
+      - /mnt/storage/media/ebooks:/ebooks
+      - /mnt/storage/downloads:/downloads
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
 
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
@@ -163,7 +188,7 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - /mnt/apps/appdata/lidarr:/config
+      - /mnt/docker-local/appdata-local/lidarr:/config
       - /mnt/storage/media/music:/music
       - /mnt/storage/downloads:/downloads
 
@@ -179,7 +204,7 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - /mnt/apps/appdata/bazarr:/config
+      - /mnt/docker-local/appdata-local/bazarr:/config
       - /mnt/storage/media/tv:/tv
       - /mnt/storage/media/movies:/movies
 
@@ -194,7 +219,7 @@ services:
       - qbittorrent
     volumes:
       - /mnt/apps/cross-seed:/config
-      - /mnt/apps/qbittorrent/qBittorrent/BT_backup:/torrents:ro
+      - /mnt/docker-local/appdata-local/qbittorrent/qBittorrent/BT_backup:/torrents:ro
       - /mnt/storage/downloads:/downloads
       - /mnt/storage/media/tv:/tv:ro
       - /mnt/storage/media/movies:/movies:ro
