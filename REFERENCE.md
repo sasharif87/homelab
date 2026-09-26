@@ -256,6 +256,19 @@ HACS → **Elegoo Printers** ([danielcherubini/elegoo-homeassistant](https://git
 
 The feeder only auto-switches slots for matching filament. Running out mid-print with a different colour in the next slot pauses the print. To change colour, select the slot in the web UI Filament panel → Unload → Load, or pick the slot when slicing. Run Orca's flow rate and pressure advance calibration on each new spool.
 
+Cardboard spools shed dust into the feeder rollers. Fix with rim rings on existing spools, and buy spool-free refills for a reusable spool going forward.
+
+### Printer mods
+
+Only use models made for the CC2 — original Centauri Carbon parts don't fit. Status: `planned` → `printed` → `installed`.
+
+| Mod | Model | Filament | Status | Notes |
+|:---|:---|:---|:---|:---|
+| Waste chute | [CC2 Waste System (Jeremy Sapp)](https://www.printables.com/model/1589031-centauri-carbon-2-waste-system-cc2-poop-chute) | Black PLA | planned | Slides on, held by the 2 existing screws |
+| Spool rim rings | [Universal Cardboard Spool Adapter Ring](https://makerworld.com/en/models/988003-universal-cardboard-spool-adapter-ring) | White PLA (sample leftover) | planned | ~4 g each; test fit one on the Canvas before printing a set |
+| Reusable spool | [Reusable spool for Elegoo cardboard spools](https://www.printables.com/model/1250643-reusable-spool-for-filament-from-cardboard-spools) | Black PLA | planned | Or buy Elegoo's official reusable spool and use refills |
+| Side spool cover | [CC2 Spool Cover Anti-Dust (Sienek)](https://www.thingiverse.com/thing:7361381) | Black PLA | planned | Slides onto the side-mounted holder; alternative is the CC1/CC2 side dry box |
+
 ---
 
 ## Services by Category
