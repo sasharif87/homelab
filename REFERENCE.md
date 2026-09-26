@@ -267,7 +267,8 @@ Only use models made for the CC2 — original Centauri Carbon parts don't fit. S
 | Waste chute | [CC2 Waste System (Jeremy Sapp)](https://www.printables.com/model/1589031-centauri-carbon-2-waste-system-cc2-poop-chute) | Black PLA | planned | Slides on, held by the 2 existing screws |
 | Spool rim rings | [Universal Cardboard Spool Adapter Ring](https://makerworld.com/en/models/988003-universal-cardboard-spool-adapter-ring) | White PLA (sample leftover) | planned | ~4 g each; test fit one on the Canvas before printing a set |
 | Reusable spool | [Reusable spool for Elegoo cardboard spools](https://www.printables.com/model/1250643-reusable-spool-for-filament-from-cardboard-spools) | Black PLA | planned | Or buy Elegoo's official reusable spool and use refills |
-| Side spool cover | [CC2 Spool Cover Anti-Dust (Sienek)](https://www.thingiverse.com/thing:7361381) | Black PLA | planned | Slides onto the side-mounted holder; alternative is the CC1/CC2 side dry box |
+| Side dry box | [CC1/CC2 Side Dry Box (Lee Christopher)](https://www.printables.com/model/1759212-centauri-carbon-1-and-2-dry-box-for-mfs) | Black PLA | planned | Bolts to the existing side spool mount holes; two desiccant boxes, ~15-20% below room humidity. Check fit against your Canvas spool position first |
+| Tool holder | [CC2 Tool Holder, magnetic (Mitchell)](https://www.printables.com/model/1609864-centauri-carbon-2-tool-holder-magnetic) | Black PLA | planned | Right side of the printer; holds the included tools |
 
 ---
 
