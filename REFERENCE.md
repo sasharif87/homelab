@@ -221,6 +221,43 @@ The 3-2-1 rule: 3 copies, 2 different media, 1 offsite. App configs are small �
 
 ---
 
+## 3D Printer (Elegoo Centauri Carbon 2)
+
+LAN-only printer with a 4-slot filament feeder (Canvas). Give it a DHCP reservation — the slicer and Home Assistant both point at a fixed IP.
+
+**Access code:** shown on the printer under Settings → Network once **LAN Only Mode** is on. It's case-sensitive and the font makes `O`/`0` and `I`/`l`/`1` hard to tell apart. Enabling LAN Only Mode can generate a new code, so update every client if you toggle it. Keep it in Vaultwarden, not in git.
+
+| Thing | Value |
+|:---|:---|
+| Web UI | `http://<printer-ip>` — camera, temps, file upload (**+ Import**), filament load/unload |
+| MQTT | port `1883`, served by the printer itself (used by Home Assistant) |
+| Auth | access code from the printer screen |
+
+### Slicer (OrcaSlicer / ElegooSlicer)
+
+Printer → Wi-Fi icon → Physical Printer:
+
+- Host Type: **Elegoo Link**
+- Hostname: bare IP, no `http://`, no port (the field is narrow — press Home to check the first digit didn't get dropped)
+- API Key / Password: the access code
+
+`HTTP 401 Unauthorized` on Test means the printer was reached but the code is missing or wrong. If the code works in the web UI but Orca still returns 401, the Orca build doesn't speak CC2 auth yet — use ElegooSlicer, or upload through the web UI.
+
+### Home Assistant
+
+HACS → **Elegoo Printers** ([danielcherubini/elegoo-homeassistant](https://github.com/danielcherubini/elegoo-homeassistant)) → restart → Settings → Devices & Services → Add Integration → Elegoo Printers → IP + access code.
+
+- Requires LAN Only Mode; cloud mode isn't supported
+- HA must reach the printer on port 1883 — a Docker HA needs `network_mode: host`; HAOS in a VM is fine
+- Entities: camera, nozzle/bed/chamber temps, status, progress, layers, per-slot filament sensors, file picker + print button
+- Per-slot filament usage needs the optional [elegoo-printer-proxy](https://github.com/lantern-eight/elegoo-printer-proxy); without it only total usage is reported
+
+### Filament swaps
+
+The feeder only auto-switches slots for matching filament. Running out mid-print with a different colour in the next slot pauses the print. To change colour, select the slot in the web UI Filament panel → Unload → Load, or pick the slot when slicing. Run Orca's flow rate and pressure advance calibration on each new spool.
+
+---
+
 ## Services by Category
 
 ### Public (need a domain + SSL)
