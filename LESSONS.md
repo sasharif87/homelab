@@ -85,6 +85,9 @@ If your router hands out only your server's IP as DNS and the server goes down, 
 **Gluetun VPN containers: always use `localhost`, never the host IP, for inter-container connections.**
 Services sharing Gluetun's network namespace are on the same loopback interface. Using the host VM IP for connections between them routes out and back in through the VPN tunnel. Use `localhost:port` for all container-to-container connections inside the Gluetun stack.
 
+**When an app asks for its host or base URL, give it the full address from your browser bar: scheme and port included.**
+TubeArchivist had `TA_HOST` set to a bare IP. Browsing worked fine, but every action that changed something (unsubscribing, subscribing to a playlist, deleting a video) dumped me back on the login page. The real error was hidden: TA builds its CSRF trusted origins from `TA_HOST`, so it trusted `http://<server-ip>` while the browser was sending `http://<server-ip>:8000`. Every write got a 403, and the frontend treats any 403 as "you're logged out." Fix: `TA_HOST=http://<server-ip>:8000`, with any extra addresses (like a reverse-proxy hostname) space-separated. If reads work but writes bounce you to login, open DevTools → Network and read the 403's response body before changing anything else.
+
 ---
 
 ## ZFS
