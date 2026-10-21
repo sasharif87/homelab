@@ -20,7 +20,13 @@ services:
       - REDIS_CON=redis://tubearchivist-redis:6379
       - HOST_UID=1000
       - HOST_GID=1000
-      - TA_HOST=<server-ip>
+      # Must be the full browser origin (scheme + port), not a bare IP (Oct 21,
+      # 2026): TA builds CSRF_TRUSTED_ORIGINS from this, and a bare IP only
+      # trusts http://<server-ip>, so every write from http://<server-ip>:8000
+      # (unsubscribe, playlist subscribe, deletes) 403'd with "Origin checking
+      # failed" and the UI bounced to /login. Space-separate extra origins
+      # (e.g. a reverse-proxy hostname) if TA is reached more than one way.
+      - TA_HOST=http://<server-ip>:8000
       - TA_USERNAME=admin
       - TA_PASSWORD=${TA_PASSWORD}
       - ELASTIC_PASSWORD=${TA_ES_PASSWORD}
